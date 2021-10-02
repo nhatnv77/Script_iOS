@@ -40,10 +40,10 @@ else
   echo -e "${red}检测架构失败，使用默认架构: ${arch}${plain}"
 fi
 
-echo "architecture: ${arch}"
+echo "架构: ${arch}"
 
-if [$(getconf WORD_BIT) != '32'] && [$(getconf LONG_BIT) != '64']; then
-    echo "This software does not support 32-bit systems (x86), please use 64-bit systems (x86_64), if the detection is wrong, please contact the author"
+if [ $(getconf WORD_BIT) != '32' ] && [ $(getconf LONG_BIT) != '64' ] ; then
+    echo "本软件不支持 32 位系统(x86)，请使用 64 位系统(x86_64)，如果检测有误，请联系作者"
     exit -1
 fi
 
