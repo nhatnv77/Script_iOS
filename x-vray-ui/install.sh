@@ -8,7 +8,7 @@ plain='\033[0m'
 cur_dir=$(pwd)
 
 # check root
-[[ $EUID -ne 0 ]] && echo -e "${red}错误：${plain} 必须使用root用户运行此脚本！\n" && exit 1
+[[ $EUID -ne 0 ]] && echo -e "${red} Error：${plain}You must use the ROOT user to run this script!\n" && exit 1
 
 # check os
 if [[ -f /etc/redhat-release ]]; then
@@ -26,7 +26,7 @@ elif cat /proc/version | grep -Eqi "ubuntu"; then
 elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
     release="centos"
 else
-    echo -e "${red}未检测到系统版本，请联系脚本作者！${plain}\n" && exit 1
+    echo -e "${red} The system version is not detected, please contact the script author! ${plain}\n" && exit 1
 fi
 
 arch=$(arch)
@@ -37,13 +37,13 @@ elif [[ $arch == "aarch64" || $arch == "arm64" ]]; then
   arch="arm64"
 else
   arch="amd64"
-  echo -e "${red}检测架构失败，使用默认架构: ${arch}${plain}"
+  echo -e "${red} Failed to detect the architecture, use the default architecture: ${arch}${plain}"
 fi
 
-echo "架构: ${arch}"
+echo "Architecture: ${arch}"
 
 if [ $(getconf WORD_BIT) != '32' ] && [ $(getconf LONG_BIT) != '64' ] ; then
-    echo "本软件不支持 32 位系统(x86)，请使用 64 位系统(x86_64)，如果检测有误，请联系作者"
+    echo "This software does not support 32-bit systems (x86)，Please use a 64-bit system (x86_64), if the detection is wrong, please contact the author"
     exit -1
 fi
 
@@ -59,15 +59,15 @@ fi
 
 if [[ x"${release}" == x"centos" ]]; then
     if [[ ${os_version} -le 6 ]]; then
-        echo -e "${red}请使用 CentOS 7 或更高版本的系统！${plain}\n" && exit 1
+        echo -e "${red} Please use CentOS 7 or higher version system! ${plain}\n" && exit 1
     fi
 elif [[ x"${release}" == x"ubuntu" ]]; then
     if [[ ${os_version} -lt 16 ]]; then
-        echo -e "${red}请使用 Ubuntu 16 或更高版本的系统！${plain}\n" && exit 1
+        echo -e "${red}Please use Ubuntu 16 or higher version system! ${plain}\n" && exit 1
     fi
 elif [[ x"${release}" == x"debian" ]]; then
     if [[ ${os_version} -lt 8 ]]; then
-        echo -e "${red}请使用 Debian 8 或更高版本的系统！${plain}\n" && exit 1
+        echo -e "${red} Please use Debian 8 or higher version system! ${plain}\n" && exit 1
     fi
 fi
 
@@ -86,22 +86,22 @@ install_x-ui() {
     if  [ $# == 0 ] ;then
         last_version=$(curl -Ls "https://api.github.com/repos/vaxilu/x-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
         if [[ ! -n "$last_version" ]]; then
-            echo -e "${red}failed to detect the x-ui versionwhich may be beyond the Github API limit, please try again later, or manually specify the x-ui version to install ${plain}"
+            echo -e "${red} Failed to detect the x-ui version, it may be beyond the Github API limit, please try again later, or manually specify the x-ui version to install ${plain}"
             exit 1
         fi
-        echo -e "The latest version of x-ui is detected： ${last_version}，start installation"
+        echo -e "The latest version of x-ui detected：${last_version}，Start installation"
         wget -N --no-check-certificate -O /usr/local/x-ui-linux-${arch}.tar.gz https://github.com/vaxilu/x-ui/releases/download/${last_version}/x-ui-linux-${arch}.tar.gz
         if [[ $? -ne 0 ]]; then
-            echo -e "${red}failed to download x-ui, please make sure your server can download Github files ${plain}"
+            echo -e "${red}Download x-ui failed, please make sure your server can download Github files ${plain}"
             exit 1
         fi
     else
         last_version=$1
         url="https://github.com/vaxilu/x-ui/releases/download/${last_version}/x-ui-linux-${arch}.tar.gz"
-        echo -e "开始安装 x-ui v$1"
+        echo -e "Start to install x-ui v$1"
         wget -N --no-check-certificate -O /usr/local/x-ui-linux-${arch}.tar.gz ${url}
         if [[ $? -ne 0 ]]; then
-            echo -e "${red}download x-ui v$1 failed, please make sure this version exists${plain}"
+            echo -e "${red}Download x-ui v$1 failed, please make sure this version exists ${plain}"
             exit 1
         fi
     fi
@@ -120,31 +120,31 @@ install_x-ui() {
     systemctl daemon-reload
     systemctl enable x-ui
     systemctl start x-ui
-    echo -e "${green}x-ui v${last_version}${plain} The installation is complete, the panel has been activated,"
+    echo -e "${green}x-ui v${last_version}${plain} The installation is complete, the panel has started,"
     echo -e ""
-    echo -e "If it is a new installation, the default web port is ${green}54321${plain}, and the default username and password are both ${green}admin${plain}"
-    echo -e "Please make sure that this port is not occupied by other programs, ${yellow} and make sure that port 54321 has been released ${plain}"
-#    echo -e "If you want to modify 54321 to another port, enter the x-ui command to modify it, and also make sure that the port you modify is also allowed"
+    echo -e "If it is a new installation, the default web port is ${green} 54321 ${plain}，The username and password are both by default ${green}admin${plain}"
+    echo -e "Please make sure that this port is not occupied by other programs. ${yellow}And make sure 54321 Port has been released ${plain}"
     echo -e ""
     echo -e "If it is to update the panel, access the panel as you did before"
     echo -e ""
-    echo -e "x-ui management script usage: "
+    echo -e "x-ui How to use the management script: "
     echo -e "----------------------------------------------"
-    echo -e "x-ui              - show management menu (more functions)"
-    echo -e "x-ui start        - start x-ui panel"
-    echo -e "x-ui stop         - stop x-ui panel"
-    echo -e "x-ui restart      - restart x-ui panel"
-    echo -e "x-ui status       - view x-ui status"
-    echo -e "x-ui enable       - set x-ui to start automatically after booting"
-    echo -e "x-ui disable      - cancel x-ui boot from start"
-    echo -e "x-ui log          - view x-ui log"
+    echo -e "x-ui              - Display management menu (more functions)"
+    echo -e "x-ui start        - Launch x-ui panel"
+    echo -e "x-ui stop         - Stop the x-ui panel"
+    echo -e "x-ui restart      - Restart the x-ui panel"
+    echo -e "x-ui status       - View x-ui status"
+    echo -e "x-ui enable       - Set x-ui to start automatically after booting"
+    echo -e "x-ui disable      - Cancel x-ui boot to start automatically"
+    echo -e "x-ui log          - View x-ui log"
     echo -e "x-ui v2-ui        - Migrate the v2-ui account data of this machine to x-ui"
-    echo -e "x-ui update       - update x-ui panel"
-    echo -e "x-ui install      - install x-ui panel"
-    echo -e "x-ui uninstall    - uninstall x-ui panel"
+    echo -e "x-ui update       - Update x-ui panel"
+    echo -e "x-ui install      - Install the x-ui panel"
+    echo -e "x-ui uninstall    - Uninstall the x-ui panel"
     echo -e "----------------------------------------------"
 }
 
-echo -e "${green} start to install ${plain}"
+echo -e "${green} Start installation ${plain}"
 install_base
 install_x-ui $1
+1
