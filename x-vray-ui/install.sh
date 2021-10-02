@@ -37,7 +37,7 @@ elif [[ $arch == "aarch64" || $arch == "arm64" ]]; then
   arch="arm64"
 else
   arch="amd64"
-  echo -e "${red} failed to detect architecture, use default architecture: ${arch}${plain}"
+  echo -e "${red}检测架构失败，使用默认架构: ${arch}${plain}"
 fi
 
 echo "architecture: ${arch}"
