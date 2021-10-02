@@ -147,4 +147,3 @@ install_x-ui() {
 echo -e "${green} Start installation ${plain}"
 install_base
 install_x-ui $1
-
